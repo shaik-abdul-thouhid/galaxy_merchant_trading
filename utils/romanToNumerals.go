@@ -15,7 +15,17 @@ var RomanLiteralsToInt64Mapping = map[string]int64{
 	"M": 1000,
 }
 
+// RomanToInt64 converts a roman numeral string to an int64.
+// It validates the format, counting occurrences of numerals and
+// ensuring they don't exceed 3. It trims whitespace, gets the
+// last numeral, and converts to int64. It then iterates from
+// end to start, adding/subtracting values based on order per
+// roman numeral rules, returning the result int64 and nil error
+// or 0 and an error for invalid input.
 func RomanToInt64(s string) (int64, error) {
+	if len(s) == 0 {
+		return 0, fmt.Errorf("requested number is in invalid format")
+	}
 
 	var romanNumeralCounts = make(map[string]int)
 
@@ -25,7 +35,7 @@ func RomanToInt64(s string) (int64, error) {
 
 	for _, count := range romanNumeralCounts {
 		if count > 3 {
-			return 0, fmt.Errorf("Requested number is in invalid format")
+			return 0, fmt.Errorf("requested number is in invalid format")
 		}
 	}
 
@@ -50,6 +60,9 @@ func RomanToInt64(s string) (int64, error) {
 	return result, nil
 }
 
+// Int64ToRoman converts an int64 to a roman numeral string.
+// It iterates over arrays of roman numeral values and symbols,
+// building the roman numeral string for the input number.
 func Int64ToRoman(num int64) string {
 
 	values := []int64{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}

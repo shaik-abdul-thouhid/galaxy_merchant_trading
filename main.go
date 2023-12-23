@@ -4,38 +4,53 @@ import (
 	"bufio"
 	parse "coffee/assessment/parseStrings"
 	"fmt"
-	"io"
 	"log"
 	"os"
 )
 
+func isValidFile(path string) bool {
+
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	return !info.IsDir()
+}
+
 func main() {
 
-	f, err := os.Open("sample_input.txt")
+	arguments := os.Args[1:]
+
+	if len(arguments) != 1 {
+		log.Fatal("Expected path to the input text file")
+		os.Exit(1)
+	} else if !isValidFile(arguments[0]) {
+		log.Fatal("invalid file path")
+		os.Exit(1)
+	}
+
+	file, err := os.Open(arguments[0])
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
 
-	reader := bufio.NewReader(f)
+	defer file.Close()
 
-	for {
-		line, err := reader.ReadString('\n')
-		if err == io.EOF {
-			break
+	parser := parse.NewParseQueries()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		result, err := parser.ParseLines(line)
+
+		if result != "" {
+			fmt.Println(result)
 		} else if err != nil {
-			log.Fatal(err)
-		}
-
-		err = parse.ParseLines(line)
-
-		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	}
-
-	map1, map2 := parse.GetMaps()
-
-	fmt.Println("map1", map1)
-	fmt.Println("map2", map2)
 }
